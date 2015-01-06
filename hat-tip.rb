@@ -10,10 +10,7 @@ class Request
 end
 
 class Response
-  @@resources = [
-    "welcome",
-    "profile"
-  ]
+  @@resources = Dir["views/*.html"].map { |file_name| File.basename(file_name, ".html") }
 
   def initialize request
     @request = request
@@ -45,36 +42,15 @@ class Response
   end
 
   def body
-    case @request.resource
-    when "welcome"
-      [
-        "<html>",
-        "<head>",
-        "<title>Welcome</title>",
-        "</head>",
-        "<body>",
-        "<h1>Hello World</h1>",
-        "<p>Welcome to the world's simplest web server.</p>",
-        "<p><img src='http://i.imgur.com/A3crbYQ.gif'></p>",
-        "</body>",
-        "</html>\r\n\r\n"
-      ].join("\r\n")
-    when "profile"
-      @status = 200
-      [
-        "<html>",
-        "<head>",
-        "<title>My Profile Page</title>",
-        "</head>",
-        "<body>",
-        "<p>This is my profile page.</p>",
-        "</body>",
-        "</html>\r\n\r\n"
-      ].join("\r\n")
+    if @status == 404
+      render 404
     else
-      @status = 404
-      "not found\r\n\r\n"
+      render @request.resource
     end
+  end
+
+  def render file_name
+    File.read("views/#{file_name}.html")
   end
 end
 
