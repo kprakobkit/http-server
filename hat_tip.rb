@@ -19,7 +19,7 @@ class Response
   @@resources = Dir["views/*.html"].map { |file_name| File.basename(file_name, ".html") }
 
   def initialize request
-    p @request = request
+    @request = request
     @status = get_status
   end
 
@@ -61,8 +61,6 @@ class Response
       @request.params_hash.each do |param, value|
         body.gsub!(/{{#{param}}}/, value.first)
       end
-      # body.gsub!(/{{ first }}/, @request.params_hash["first"].first)
-      # body.gsub!(/{{ last }}/, @request.params_hash["last"].first)
     end
     body
   end
