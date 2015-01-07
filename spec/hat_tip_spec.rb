@@ -1,4 +1,4 @@
-require 'CGI'
+require 'cgi'
 require_relative '../hat_tip'
 
 describe Server do
@@ -70,7 +70,6 @@ describe Response do
     let (:request_with_params) { "GET /welcome?#{params} HTTP/1.1" }
     let (:request) { Request.new request_with_params }
     let (:response) { Response.new request }
-    let (:resources) { ["welcome", "foobar"] }
 
     describe "#new" do
       it "should instantiate a new response object" do

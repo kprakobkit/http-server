@@ -1,21 +1,32 @@
 require 'socket'
-require 'CGI'
+require 'cgi'
 
 class Request
+  attr_accessor :request_lines
   attr_reader :resource
 
-  def initialize request_line
-    @request = request_line.split(" ")
-    @resource = @request[1].split("?")[0].gsub(/\//,"")
-    @params = @request[1].split("?")[1]
+  def initialize
+    @request_lines = []
+  end
+
+  def build_request
+    request_line = @request_lines.first.split(" ")
+    @resource = request_line[1].split("?")[0].gsub(/\//,"")
+    @params = request_line[1].split("?")[1]
   end
 
   def params_hash
     CGI::parse(@params) if @params
   end
+
+  def cookie
+    @request_lines[-1].split(": ").last # assuming the cookie in the request is the last attribute
+  end
 end
 
 class Response
+  @@visits = {}
+
   def initialize request
     @request = request
     @status = get_status
@@ -45,7 +56,8 @@ class Response
       "Server: Neo Server",
         "Content-Type: text/html; charset=UTF-8",
         "Content-Length: #{body.length}",
-      "Connection: Close\r\n\r\n"
+      "Connection: Close",
+      "Set-Cookie: name=computer2\r\n\r\n"
     ].join("\r\n")
   end
 
@@ -77,7 +89,13 @@ class Server
     server = TCPServer.new @port
     loop do
       socket = server.accept
-      request = Request.new(socket.gets)
+      request = Request.new
+
+      while request_line = socket.gets and request_line !~ /^\s*$/
+        request.request_lines << request_line.chomp
+      end
+
+      request.build_request
       response = Response.new(request)
 
       socket.puts response.header
