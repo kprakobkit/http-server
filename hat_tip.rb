@@ -16,15 +16,17 @@ class Request
 end
 
 class Response
-  @@resources = Dir["views/*.html"].map { |file_name| File.basename(file_name, ".html") }
-
   def initialize request
     @request = request
     @status = get_status
   end
 
+  def resources
+    Dir["views/*.html"].map { |file_name| File.basename(file_name, ".html") }
+  end
+
   def get_status
-    @@resources.include?(@request.resource) ? 200 : 404
+    resources.include?(@request.resource) ? 200 : 404
   end
 
   def status_message

@@ -53,7 +53,7 @@ describe Response do
 
   describe "#get_status" do
     before :each do
-      Response.class_variable_set(:@@resources, resources)
+      allow_any_instance_of(Response).to receive(:resources).and_return(resources)
     end
 
     it "should return 200 if the resource exists" do
@@ -71,10 +71,6 @@ describe Response do
     let (:request) { Request.new request_with_params }
     let (:response) { Response.new request }
     let (:resources) { ["welcome", "foobar"] }
-
-    before :each do # restore class variables
-      Response.class_variable_set(:@@resources, resources)
-    end
 
     describe "#new" do
       it "should instantiate a new response object" do
