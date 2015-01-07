@@ -6,7 +6,7 @@ class Request
 
   def initialize request_line
     @request = request_line.split(" ")
-    @resource = @request[1].split("&")[0].gsub(/\//,"")
+    @resource = @request[1].split("?")[0].gsub(/\//,"")
     @params = @request[1].split("?")[1]
   end
 
@@ -19,7 +19,7 @@ class Response
   @@resources = Dir["views/*.html"].map { |file_name| File.basename(file_name, ".html") }
 
   def initialize request
-    @request = request
+    p @request = request
     @status = get_status
   end
 
@@ -56,7 +56,12 @@ class Response
   end
 
   def render file_name
-    File.read("views/#{file_name}.html")
+    body = File.read("views/#{file_name}.html")
+    if @request.params_hash
+    body.gsub!(/{{ first }}/, @request.params_hash["first"].first)
+    body.gsub!(/{{ last }}/, @request.params_hash["last"].first)
+    end
+    body
   end
 end
 
