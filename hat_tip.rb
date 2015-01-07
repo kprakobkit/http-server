@@ -58,8 +58,11 @@ class Response
   def render file_name
     body = File.read("views/#{file_name}.html")
     if @request.params_hash
-    body.gsub!(/{{ first }}/, @request.params_hash["first"].first)
-    body.gsub!(/{{ last }}/, @request.params_hash["last"].first)
+      @request.params_hash.each do |param, value|
+        body.gsub!(/{{#{param}}}/, value.first)
+      end
+      # body.gsub!(/{{ first }}/, @request.params_hash["first"].first)
+      # body.gsub!(/{{ last }}/, @request.params_hash["last"].first)
     end
     body
   end
