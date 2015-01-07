@@ -64,4 +64,29 @@ describe Response do
       expect(invalid_response.instance_variable_get(:@status)).to eq 404
     end
   end
+
+  describe "body" do
+    let (:params) { "first=Peter&last=Prakobkit" }
+    let (:request_with_params) { "GET /welcome?#{params} HTTP/1.1" }
+    let (:request) { Request.new request_with_params }
+    let (:response) { Response.new request }
+    let (:resources) { ["welcome", "foobar"] }
+
+    before :each do # restore class variables
+      Response.class_variable_set(:@@resources, resources)
+    end
+
+    describe "#new" do
+      it "should instantiate a new response object" do
+        expect(valid_response).to be_a Response
+      end
+    end
+
+    context "welcome page" do
+      it "should have the right content" do
+        expect(response.body).to include "Peter"
+        expect(response.body).to include "Prakobkit"
+      end
+    end
+  end
 end
