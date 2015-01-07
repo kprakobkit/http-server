@@ -1,3 +1,4 @@
+require 'CGI'
 require_relative '../hat_tip'
 
 describe Server do
@@ -14,6 +15,9 @@ end
 
 describe Request do
   let (:request_line) { "GET /foobar HTTP/1.1" }
+  let (:params) { "param1=value1&param2=value2" }
+  let (:params_hash) { CGI::parse(params) }
+  let (:request_with_params) { "GET /foobar?#{params} HTTP/1.1" }
   let (:request) { Request.new request_line }
 
   describe "#new" do
@@ -21,8 +25,13 @@ describe Request do
       expect(request).to be_a Request
     end
 
-    it "should @resource by parsing the request line" do
+    it "should assign @resource by parsing the request line" do
       expect(request.resource).to eq "foobar"
+    end
+
+    it "should assign @params" do
+      request = Request.new request_with_params
+      expect(request.params_hash).to eq params_hash
     end
   end
 end
@@ -42,7 +51,7 @@ describe Response do
     end
   end
 
-  describe "#get_stats" do
+  describe "#get_status" do
     before :each do
       Response.class_variable_set(:@@resources, resources)
     end

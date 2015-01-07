@@ -1,11 +1,17 @@
 require 'socket'
+require 'CGI'
 
 class Request
   attr_reader :resource
 
   def initialize request_line
-    @request_line = request_line
-    @resource = @request_line.split[1].gsub(/\//,"")
+    @request = request_line.split(" ")
+    @resource = @request[1].split("&")[0].gsub(/\//,"")
+    @params = @request[1].split("?")[1]
+  end
+
+  def params_hash
+    CGI::parse(@params) if @params
   end
 end
 
